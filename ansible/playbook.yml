@@ -1,0 +1,30 @@
+- name: Deploy Flask App via Docker
+  hosts: flask_ec2
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull Flask Docker image
+      docker_image:
+        name: nikile23/flask-aws-devops
+        source: pull
+
+    - name: Run Flask container
+      docker_container:
+        name: flask-app
+        image: nikile23/flask-aws-devops
+        state: started
+        restart_policy: always
+        ports:
+          - "5000:5000"
